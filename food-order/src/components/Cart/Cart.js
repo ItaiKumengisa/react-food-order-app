@@ -7,7 +7,7 @@ const Cart = (props) => {
         )
     }</ul>;
 
-    return <Modal>
+    return <Modal onClickBackDrop={props.onClose}>
         {cartItems}
         <div className={classes.total}>
             <span>Total Amount</span>
