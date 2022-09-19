@@ -15,8 +15,36 @@ const cartReducer = (state, action) => {
     switch(action.type){
         case ACTIONS.ADD_ITEM:
            
-            const updatedItems = state.items.concat(action.item);
             const newAmount = state.totalAmount + action.item.price * action.item.amount;
+
+            const existingCartItemIndex = state.items.findIndex(item => item.id === action.item.id);
+
+            const existingCartItem = state.items[existingCartItemIndex];
+
+            let updatedItem;
+            let updatedItems;
+
+            if(existingCartItem){
+                updatedItem = {
+                    ...existingCartItem,
+                    amount: existingCartItem.amount + action.item.amount
+                }
+
+
+                //Here we are copying the current array of items stored in the state
+                updatedItems = [...state.items];
+
+                //Then, because the item we're adding already exists in the array, we just access it and
+                //Manually adjust the amount
+
+                updatedItems[existingCartItemIndex] = updatedItem;
+            } else {
+                updatedItem = {
+                    ...action.item
+                }
+
+                updatedItems = state.items.concat(updatedItem);
+            }
 
             return {items: updatedItems, totalAmount: newAmount};
         
