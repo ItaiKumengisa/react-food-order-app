@@ -1,6 +1,8 @@
 import classes from './AvailableMeals.module.css';
 import MealItem from './MealItem/MealItem';
 import Card from '../UI/Card';
+import CartContext from '../../store/cart-context';
+import { useContext } from 'react';
 
 const DUMMY_MEALS = [
     {
@@ -30,6 +32,8 @@ const DUMMY_MEALS = [
 ];
 const AvailableMeals = () => {
     //Creating a local varaible to map the meals to jsx
+    const cartCtx = useContext(CartContext);
+    
     const mealsList = DUMMY_MEALS.map(meal =>
         <MealItem
             id={meal.id}
@@ -39,6 +43,9 @@ const AvailableMeals = () => {
             price={meal.price}
         />
     );
+
+    
+
     return <section className={classes.meals}>
         <Card>
             <ul>
