@@ -7,8 +7,6 @@ import CartItem from './CartItem/CartItem';
 const Cart = (props) => {
     const cartCtx = useContext(CartContext);
     const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`;
-    console.log(cartCtx)
-
     const onRemoveHandler = (id) => {
         cartCtx.removeItem(id)
     }
@@ -35,6 +33,7 @@ const Cart = (props) => {
             )
         }
     </ul>;
+
     const hasItems = cartCtx.items.length > 0;
 
     return <Modal onClickBackDrop={props.onClose}>

@@ -12,47 +12,79 @@ const defaultCartState = {
 };
 
 const cartReducer = (state, action) => {
-    switch(action.type){
+
+    //In all of the cases below we need to return a new state, so a whole new array of cart items
+    switch (action.type) {
         case ACTIONS.ADD_ITEM:
-           
-            const newAmount = state.totalAmount + action.item.price * action.item.amount;
 
-            const existingCartItemIndex = state.items.findIndex(item => item.id === action.item.id);
+            {
+                const newAmount = state.totalAmount + action.item.price * action.item.amount;
 
-            const existingCartItem = state.items[existingCartItemIndex];
+                const existingCartItemIndex = state.items.findIndex(item => item.id === action.item.id);
 
-            let updatedItem;
-            let updatedItems;
+                const existingCartItem = state.items[existingCartItemIndex];
 
-            if(existingCartItem){
-                updatedItem = {
-                    ...existingCartItem,
-                    amount: existingCartItem.amount + action.item.amount
+                let updatedItem;
+                let updatedItems;
+
+                if (existingCartItem) {
+                    updatedItem = {
+                        ...existingCartItem,
+                        amount: existingCartItem.amount + action.item.amount
+                    }
+
+
+                    //Here we are copying the current array of items stored in the state
+                    updatedItems = [...state.items];
+
+                    //Then, because the item we're adding already exists in the array, we just access it and
+                    //Manually adjust the amount
+
+                    updatedItems[existingCartItemIndex] = updatedItem;
+                } else {
+                    updatedItem = {
+                        ...action.item
+                    }
+
+                    updatedItems = state.items.concat(updatedItem);
                 }
 
-
-                //Here we are copying the current array of items stored in the state
-                updatedItems = [...state.items];
-
-                //Then, because the item we're adding already exists in the array, we just access it and
-                //Manually adjust the amount
-
-                updatedItems[existingCartItemIndex] = updatedItem;
-            } else {
-                updatedItem = {
-                    ...action.item
-                }
-
-                updatedItems = state.items.concat(updatedItem);
+                return { items: updatedItems, totalAmount: newAmount };
             }
 
-            return {items: updatedItems, totalAmount: newAmount};
-        
 
         case ACTIONS.REMOVE_ITEM:
-            return "Remove";
+            {
+                //Find the index of the item in the cart that we want to remove
+                const existingCartItemIndex = state.items.findIndex(item => item.id === action.id);
+
+                //Use the index to find the item
+                const existingCartItem = state.items[existingCartItemIndex];
+
+                //Use the price from the item to calculate the new total
+                const newAmount = state.totalAmount - existingCartItem.price;
+
+                let updatedItem;
+                let updatedItems;
+
+                if (existingCartItem.amount <= 1) {
+                    //Create a new array from updated items and remove the item that has the id from the action
+                    updatedItems = state.items.filter(item => item.id !== action.id)
+                    return { items: updatedItems, totalAmount: newAmount };
+                } else {
+                    updatedItem = { ...existingCartItem, amount: existingCartItem.amount - 1 };
+
+                    updatedItems = [...state.items] ;
+                    updatedItems[existingCartItemIndex] = updatedItem;
+                }
+                
+                return { items: updatedItems, totalAmount: newAmount };
+            }
         default:
-            return state;
+
+            {
+                return state;
+            }
     }
 }
 
@@ -63,11 +95,11 @@ const CartProvider = (props) => {
 
     //We also want to make the item that we wish to add available to the reducer so we pass it in the object
     const addItemToCartHandler = (item) => {
-        dispatchCartAction({type: ACTIONS.ADD_ITEM, item: item})
+        dispatchCartAction({ type: ACTIONS.ADD_ITEM, item: item })
     }
 
     const removeItemFromCartHandler = (id) => {
-        dispatchCartAction({type: ACTIONS.REMOVE_ITEM, id: id})
+        dispatchCartAction({ type: ACTIONS.REMOVE_ITEM, id: id })
     }
 
     const cartContext = {
